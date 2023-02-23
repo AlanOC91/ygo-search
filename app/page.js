@@ -1,91 +1,145 @@
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from './page.module.css'
+'use client';
 
-const inter = Inter({ subsets: ['latin'] })
+import {FaSearch, FaExternalLinkAlt} from 'react-icons/fa';
+import {useState, useRef, useEffect} from 'react';
+import { CSSTransition } from 'react-transition-group';
 
-export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+export default function HomePage() {
+
+    const [searchResults, setSearchResults] = useState([]);
+    const [currentResultIndex, setCurrentResultIndex] = useState(0);
+    const [isLongDesc, setIsLongDesc] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchSubmitted, setSearchSubmitted] = useState(false);
+    const [showSearchResult, setShowSearchResult] = useState(false);
+    const [cardInfo, setCardInfo] = useState({});
+    const searchResultRef = useRef(null);
+    const searchInputRef = useRef(null);
+    const cardResultsDescriptionRef = useRef(null);
+
+    function handleBlur() {
+        const searchInputValue = searchInputRef.current.value.trim();
+        if (searchInputValue === '') {
+            setShowSearchResult(false);
+        }
+    }
+
+    const handleSearchInputChange = (event) => {
+        setSearchTerm(event.target.value);
+    };
+
+    const handleSearchFormSubmit = async (event) => {
+        event.preventDefault();
+        if (!searchTerm.trim()) {
+            return; // Ignore API request if searchTerm is empty/blank
+        }
+        setSearchSubmitted(true);
+        setShowSearchResult(true);
+
+        const response = await fetch(`https://db.ygoprodeck.com/api/v8/card_search.php?fuzzy&num=5&offset=0&ename=${searchTerm}`);
+        const data = await response.json();
+        if (data['cards']) {
+            setSearchResults(data["cards"]); //Store search results in state
+            setCurrentResultIndex(1); //Reset currentResultIndex to 0
+            setCardInfo(data['cards'][0]);
+            if (data['cards'][0].desc.length > 600) {
+                setIsLongDesc(true); //used to adjust height of card description depending on length of description
+            }else{
+                setIsLongDesc(false);
+            }
+        } else {
+            setSearchResults([]);
+            setCardInfo({});
+        }
+    };
+
+    const handleNextHitButtonClick = () => {
+        setCurrentResultIndex((prevIndex) =>
+            prevIndex === searchResults.length - 1 ? 0 : prevIndex + 1
+        );
+        const currentResult = searchResults[currentResultIndex];
+        if (currentResult) {
+            setCardInfo(currentResult);
+            if (currentResult.desc.length > 600) {
+                setIsLongDesc(true);
+            } else {
+                setIsLongDesc(false);
+            }
+        }
+    };
+
+    // Update the width of the cardResultsDescriptionRef when it has been set
+    useEffect(() => {
+        if (cardResultsDescriptionRef.current && isLongDesc) {
+            cardResultsDescriptionRef.current.style.height = "230px"; //So card text doesn't overflow
+        }else if (cardResultsDescriptionRef.current){
+            cardResultsDescriptionRef.current.style.height = "auto";
+        }
+    }, [isLongDesc]);
+
+    return (
+        <div className="container">
+            <h1 class={`text-center`}>YGOSearch - Instant Yu-Gi-Oh! Card Fuzzy Searching</h1>
+            <p class="low-margins"><a href="https://ygoprodeck.com/card-database/">Advanced Search</a></p>
+            <form className="search-form" onSubmit={handleSearchFormSubmit}>
+                <div className={`search-wrapper ${showSearchResult ? 'search-wrapper-expanded' : ''}`}>
+                    <input type="text" id="search-card" placeholder="Yu-Gi-Oh! Card..." value={searchTerm} onChange={handleSearchInputChange} onBlur={handleBlur} ref={searchInputRef} />
+                    <div className="search-icon">
+                        <FaSearch />
+                    </div>
+                </div>
+            </form>
+            <CSSTransition in={showSearchResult} timeout={300} classNames="search-result" nodeRef={searchResultRef}>
+                <div id={`search-area`} className={`search-result ${showSearchResult ? 'search-result-visible' : ''}`} ref={searchResultRef}>
+                    {searchSubmitted && cardInfo.name ? (
+                        <div className="card-info">
+                            <div className="card-image">
+                                <img src={`https://images.ygoprodeck.com/images/cards/${cardInfo.id}.jpg`} alt={cardInfo.name} />
+                            </div>
+                            <div className="card-details">
+                                <h2>{cardInfo.name}</h2>
+                                <div className="flex-items">
+                                    <p>{cardInfo.race}</p>
+                                    /
+                                    <p>{cardInfo.type}</p>
+                                    /
+                                    {cardInfo.attribute && <p> {cardInfo.attribute}</p>}
+                                </div>
+                                <div className="flex-items">
+                                    {cardInfo.atk && <p>ATK/ {cardInfo.atk}</p>}
+                                    {cardInfo.def && <p>DEF/ {cardInfo.def}</p>}
+                                    {cardInfo.linkval && <p>Link: {cardInfo.linkval}</p>}
+                                    {cardInfo.level && <p>Level: {cardInfo.level}</p>}
+                                    {cardInfo.scale && <p>Scale: {cardInfo.scale}</p>}
+                                </div>
+                                <p className="card-description" ref={cardResultsDescriptionRef}>{cardInfo.desc}</p>
+                                <div className="card-links bottom-text">
+                                    {searchResults.length > 1 && (
+                                        <button class="next-hit" onClick={handleNextHitButtonClick}>Next Hit</button>
+                                    )}
+                                    {cardInfo.id && cardInfo.konami_id && (
+                                        <>
+                                            <a href={`https://ygoprodeck.com/card/${cardInfo.pretty_url}`} target="_blank" rel="noopener noreferrer">
+                                                YGOPRODeck
+                                                <FaExternalLinkAlt className="external-link-icon" />
+                                            </a>
+                                            <a href={`https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cardInfo.konami_id}`} target="_blank" rel="noopener noreferrer">
+                                                Official Database
+                                                <FaExternalLinkAlt className="external-link-icon" />
+                                            </a>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+
+                    ): (
+                        <p className="no-results">No results found.</p>
+                    )}
+                </div>
+            </CSSTransition>
+            <p className="bottom-text mutedText">Created by <a href="https://ygoprodeck.com/">YGOPRODeck</a> ❤️</p>
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    );
 }
