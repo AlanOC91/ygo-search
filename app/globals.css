@@ -125,6 +125,11 @@ a:hover {
     margin-top: 1rem;
 }
 
+.card-description{
+    white-space: pre-line;
+    display:block;
+}
+
 .flex-items {
     display: flex;
     flex-direction: row;
@@ -144,6 +149,7 @@ a:hover {
     margin-bottom: 10px;
     font-size: 0.8rem;
     gap:5%;
+    flex-wrap: wrap;
 }
 
 .card-links a {
@@ -228,6 +234,28 @@ button[type="submit"]:hover {
     cursor: pointer;
 }
 
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media only screen and (max-width: 600px) {
+    .search-wrapper input:focus {
+        width: 250px;
+    }
+}
+
 @media only screen and (max-width: 600px) {
     .card-description{
        height: auto !important;
@@ -243,5 +271,20 @@ button[type="submit"]:hover {
         position: relative;
         bottom: initial;
         margin: 20px 0;
+    }
+    .card-info {
+        flex-direction: column;
+    }
+    .card-image {
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .card-links{
+        flex-direction: column;
+        align-items: center;
+    }
+    /* card-links items margin botton */
+    .card-links a {
+        margin-top: 15px;
     }
 }

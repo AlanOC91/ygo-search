@@ -6,6 +6,7 @@ import { CSSTransition } from 'react-transition-group';
 
 export default function HomePage() {
 
+    const [isLoading, setIsLoading] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [currentResultIndex, setCurrentResultIndex] = useState(0);
     const [isLongDesc, setIsLongDesc] = useState(false);
@@ -30,6 +31,7 @@ export default function HomePage() {
 
     const handleSearchFormSubmit = async (event) => {
         event.preventDefault();
+        setIsLoading(true);
         if (!searchTerm.trim()) {
             return; // Ignore API request if searchTerm is empty/blank
         }
@@ -39,15 +41,17 @@ export default function HomePage() {
         const response = await fetch(`https://db.ygoprodeck.com/api/v8/card_search.php?fuzzy&num=5&offset=0&ename=${searchTerm}`);
         const data = await response.json();
         if (data['cards']) {
+            setIsLoading(false);
             setSearchResults(data["cards"]); //Store search results in state
             setCurrentResultIndex(1); //Reset currentResultIndex to 0
             setCardInfo(data['cards'][0]);
-            if (data['cards'][0].desc.length > 600) {
+            if (data['cards'][0].desc.length > 550) {
                 setIsLongDesc(true); //used to adjust height of card description depending on length of description
             }else{
                 setIsLongDesc(false);
             }
         } else {
+            setIsLoading(false);
             setSearchResults([]);
             setCardInfo({});
         }
@@ -60,7 +64,7 @@ export default function HomePage() {
         const currentResult = searchResults[currentResultIndex];
         if (currentResult) {
             setCardInfo(currentResult);
-            if (currentResult.desc.length > 600) {
+            if (currentResult.desc.length > 550) {
                 setIsLongDesc(true);
             } else {
                 setIsLongDesc(false);
@@ -71,7 +75,7 @@ export default function HomePage() {
     // Update the width of the cardResultsDescriptionRef when it has been set
     useEffect(() => {
         if (cardResultsDescriptionRef.current && isLongDesc) {
-            cardResultsDescriptionRef.current.style.height = "230px"; //So card text doesn't overflow
+            cardResultsDescriptionRef.current.style.height = "300px"; //So card text doesn't overflow
         }else if (cardResultsDescriptionRef.current){
             cardResultsDescriptionRef.current.style.height = "auto";
         }
@@ -91,7 +95,9 @@ export default function HomePage() {
             </form>
             <CSSTransition in={showSearchResult} timeout={300} classNames="search-result" nodeRef={searchResultRef}>
                 <div id={`search-area`} className={`search-result ${showSearchResult ? 'search-result-visible' : ''}`} ref={searchResultRef}>
-                    {searchSubmitted && cardInfo.name ? (
+                    {isLoading ? (
+                        <div className="loader"></div>
+                    ) : searchSubmitted && cardInfo.name ? (
                         <div className="card-info">
                             <div className="card-image">
                                 <img src={`https://images.ygoprodeck.com/images/cards/${cardInfo.id}.jpg`} alt={cardInfo.name} />
@@ -106,8 +112,8 @@ export default function HomePage() {
                                     {cardInfo.attribute && <p> {cardInfo.attribute}</p>}
                                 </div>
                                 <div className="flex-items">
-                                    {cardInfo.atk && <p>ATK/ {cardInfo.atk}</p>}
-                                    {cardInfo.def && <p>DEF/ {cardInfo.def}</p>}
+                                    {cardInfo.atk !== null && <p>ATK/ {cardInfo.atk}</p>}
+                                    {cardInfo.atk !== null && <p>DEF/ {cardInfo.def}</p>}
                                     {cardInfo.linkval && <p>Link: {cardInfo.linkval}</p>}
                                     {cardInfo.level && <p>Level: {cardInfo.level}</p>}
                                     {cardInfo.scale && <p>Scale: {cardInfo.scale}</p>}
@@ -125,6 +131,10 @@ export default function HomePage() {
                                             </a>
                                             <a href={`https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cardInfo.konami_id}`} target="_blank" rel="noopener noreferrer">
                                                 Official Database
+                                                <FaExternalLinkAlt className="external-link-icon" />
+                                            </a>
+                                            <a href={`https://yugipedia.com/wiki/${cardInfo.name}`} target="_blank" rel="noopener noreferrer">
+                                                Yugipedia
                                                 <FaExternalLinkAlt className="external-link-icon" />
                                             </a>
                                         </>
