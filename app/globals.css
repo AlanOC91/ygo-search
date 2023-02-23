@@ -97,11 +97,66 @@ a:hover {
     display: flex;
 }
 
-.card-image {
+.card-image-container {
     margin-right: 20px;
 }
 
-.card-image img {
+.card-image-container {
+    position: relative;
+}
+
+.card-image-container::before,
+.card-image-container::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    background-repeat: no-repeat;
+    opacity: .5;
+    mix-blend-mode: color-dodge;
+    transition: all .33s ease;
+}
+
+.card-image-container::before{
+    background-position: 50% 50%;
+    background-size: 300% 300%;
+    background-image: linear-gradient(
+            115deg,
+            transparent 0%,
+            rgb(0, 231, 255) 25%,
+            transparent 47%,
+            transparent 53%,
+            rgb(255, 0, 231) 75%,
+            transparent 100%
+    );
+    opacity: .5;
+    filter: brightness(.5) contrast(1);
+    z-index: 1;
+}
+
+.card-image-container::after {
+    background-image: url("/sparkles.gif"),
+    url(/holo.png),
+    linear-gradient(125deg, #ff008450 15%, #fca40040 30%, #ffff0030 40%, #00ff8a20 60%, #00cfff40 70%, #cc4cfa50 85%);
+    background-position: 50% 50%;
+    background-size: 160%;
+    background-blend-mode: overlay;
+    z-index: 2;
+    filter: brightness(1) contrast(1);
+    transition: all .33s ease;
+    mix-blend-mode: color-dodge;
+    opacity: .75;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.card-image{
     max-width: 200px;
     max-height: 300px;
     border-radius: 5px;
@@ -250,13 +305,13 @@ button[type="submit"]:hover {
     100% { transform: rotate(360deg); }
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 800px) {
     .search-wrapper input:focus {
         width: 250px;
     }
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 800px) {
     .card-description{
        height: auto !important;
     }
@@ -275,7 +330,7 @@ button[type="submit"]:hover {
     .card-info {
         flex-direction: column;
     }
-    .card-image {
+    .card-image-container {
         margin-right: auto;
         margin-left: auto;
     }

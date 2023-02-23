@@ -44,7 +44,7 @@ export default function HomePage() {
         if (data['cards']) {
             setIsLoading(false);
             setSearchResults(data["cards"]); //Store search results in state
-            setCurrentResultIndex(1); //Reset currentResultIndex to 0
+            setCurrentResultIndex(0); //Reset currentResultIndex to 0
             setCardInfo(data['cards'][0]);
             if (data['cards'][0].desc.length > 550) {
                 setIsLongDesc(true); //used to adjust height of card description depending on length of description
@@ -58,19 +58,23 @@ export default function HomePage() {
         }
     };
 
-    const handleNextHitButtonClick = () => {
-        setCurrentResultIndex((prevIndex) =>
-            prevIndex === searchResults.length - 1 ? 0 : prevIndex + 1
-        );
-        const currentResult = searchResults[currentResultIndex];
-        if (currentResult) {
-            setCardInfo(currentResult);
-            if (currentResult.desc.length > 550) {
+    function cardHit(result){
+        if (result) {
+            setCardInfo(result);
+            if (result.desc.length > 550) {
                 setIsLongDesc(true);
             } else {
                 setIsLongDesc(false);
             }
         }
+    }
+
+    const handleNextHitButtonClick = () => {
+        setCurrentResultIndex((prevIndex) =>
+            prevIndex === searchResults.length - 1 ? 0 : prevIndex + 1
+        );
+        const currentResult = searchResults[currentResultIndex];
+        cardHit(currentResult);
     };
 
     // Update the width of the cardResultsDescriptionRef when it has been set
@@ -81,6 +85,32 @@ export default function HomePage() {
             cardResultsDescriptionRef.current.style.height = "auto";
         }
     }, [isLongDesc]);
+
+    // Left/Right arrow key navigation for search results
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.keyCode === 37) { // left arrow
+                setCurrentResultIndex((prevIndex) =>
+                    prevIndex === 0 ? searchResults.length - 1 : prevIndex - 1
+                );
+            } else if (event.keyCode === 39) { // right arrow
+                setCurrentResultIndex((prevIndex) =>
+                    prevIndex === searchResults.length - 1 ? 0 : prevIndex + 1
+                );
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [currentResultIndex, searchResults]);
+
+    // Update the cardInfo when currentResultIndex changes
+    useEffect(() => {
+        const currentResult = searchResults[currentResultIndex];
+        cardHit(currentResult);
+    }, [searchResults, currentResultIndex]);
 
     return (
         <div className="container">
@@ -100,12 +130,13 @@ export default function HomePage() {
                         <div className="loader"></div>
                     ) : searchSubmitted && cardInfo.name ? (
                         <div className="card-info">
-                            <div className="card-image">
+                            <div className="card-image-container">
                                 <Image
                                     src={`https://images.ygoprodeck.com/images/cards/${cardInfo.id}.jpg`}
                                     alt={`${cardInfo.name}`}
                                     width={200}
                                     height={300}
+                                    className="card-image"
                                 />
                             </div>
                             <div className="card-details">
@@ -119,7 +150,8 @@ export default function HomePage() {
                                 </div>
                                 <div className="flex-items">
                                     {cardInfo.atk !== null && <p>ATK/ {cardInfo.atk}</p>}
-                                    {cardInfo.atk !== null && <p>DEF/ {cardInfo.def}</p>}
+                                    {cardInfo.def !== null && <p>DEF/ {cardInfo.def}</p>}
+                                    {cardInfo.linkval && <p>Link: {cardInfo.linkval}</p>}
                                     {cardInfo.linkval && <p>Link: {cardInfo.linkval}</p>}
                                     {cardInfo.level && <p>Level: {cardInfo.level}</p>}
                                     {cardInfo.scale && <p>Scale: {cardInfo.scale}</p>}
@@ -127,7 +159,7 @@ export default function HomePage() {
                                 <p className="card-description" ref={cardResultsDescriptionRef}>{cardInfo.desc}</p>
                                 <div className="card-links bottom-text">
                                     {searchResults.length > 1 && (
-                                        <button className="next-hit" onClick={handleNextHitButtonClick}>Next Hit</button>
+                                        <button className="next-hit" onClick={handleNextHitButtonClick}>Next Hit (← / →)</button>
                                     )}
                                     {cardInfo.id && cardInfo.konami_id && (
                                         <>
