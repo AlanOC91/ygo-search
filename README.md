@@ -1,12 +1,14 @@
 A simple Yu-Gi-Oh! Card Fuzzy Search Application designed by [YGOPRODeck](https://ygoprodeck.com). The App utilizes the [YGOPRODeck API](https://ygoprodeck.com/api-guide/) to perform simple fuzzy searches on Yu-Gi-Oh! card names to then return the details.
 
-I mad this as I simply interested in learning about the [Next.js](https://nextjs.org/) framework and wanted to create a simple application to learn about it.
+I made this as I simply interested in learning about the [Next.js](https://nextjs.org/) framework and wanted to create a simple application to learn about it.
 
 This is a [Next.js](https://nextjs.org/) project.
 
 ## Live Demo
 
 A live demo of the App can be found at [https://ygosearch.io](https://www.ygosearch.io/).
+
+![YGOSearch Demo](https://images.ygoprodeck.com/assets/github/ygosearch.png)
 
 ## Getting Started
 
