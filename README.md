@@ -1,4 +1,12 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+A simple Yu-Gi-Oh! Card Fuzzy Search Application designed by [YGOPRODeck](https://ygoprodeck.com). The App utilizes the [YGOPRODeck API](https://ygoprodeck.com/api-guide/) to perform simple fuzzy searches on Yu-Gi-Oh! card names to then return the details.
+
+I mad this as I simply interested in learning about the [Next.js](https://nextjs.org/) framework and wanted to create a simple application to learn about it.
+
+This is a [Next.js](https://nextjs.org/) project.
+
+## Live Demo
+
+A live demo of the App can be found at [https://ygosearch.io](https://www.ygosearch.io/).
 
 ## Getting Started
 
@@ -15,10 +23,6 @@ pnpm dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
