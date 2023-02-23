@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image'
 import {FaSearch, FaExternalLinkAlt} from 'react-icons/fa';
 import {useState, useRef, useEffect} from 'react';
 import { CSSTransition } from 'react-transition-group';
@@ -83,8 +84,8 @@ export default function HomePage() {
 
     return (
         <div className="container">
-            <h1 class={`text-center`}>YGOSearch - Instant Yu-Gi-Oh! Card Fuzzy Searching</h1>
-            <p class="low-margins"><a href="https://ygoprodeck.com/card-database/">Advanced Search</a></p>
+            <h1 className={`text-center`}>YGOSearch - Instant Yu-Gi-Oh! Card Fuzzy Searching</h1>
+            <p className="low-margins"><a href="https://ygoprodeck.com/card-database/">Advanced Search</a></p>
             <form className="search-form" onSubmit={handleSearchFormSubmit}>
                 <div className={`search-wrapper ${showSearchResult ? 'search-wrapper-expanded' : ''}`}>
                     <input type="text" id="search-card" placeholder="Yu-Gi-Oh! Card..." value={searchTerm} onChange={handleSearchInputChange} onBlur={handleBlur} ref={searchInputRef} />
@@ -100,7 +101,12 @@ export default function HomePage() {
                     ) : searchSubmitted && cardInfo.name ? (
                         <div className="card-info">
                             <div className="card-image">
-                                <img src={`https://images.ygoprodeck.com/images/cards/${cardInfo.id}.jpg`} alt={cardInfo.name} />
+                                <Image
+                                    src={`https://images.ygoprodeck.com/images/cards/${cardInfo.id}.jpg`}
+                                    alt={`${cardInfo.name}`}
+                                    width={200}
+                                    height={300}
+                                />
                             </div>
                             <div className="card-details">
                                 <h2>{cardInfo.name}</h2>
@@ -121,7 +127,7 @@ export default function HomePage() {
                                 <p className="card-description" ref={cardResultsDescriptionRef}>{cardInfo.desc}</p>
                                 <div className="card-links bottom-text">
                                     {searchResults.length > 1 && (
-                                        <button class="next-hit" onClick={handleNextHitButtonClick}>Next Hit</button>
+                                        <button className="next-hit" onClick={handleNextHitButtonClick}>Next Hit</button>
                                     )}
                                     {cardInfo.id && cardInfo.konami_id && (
                                         <>
@@ -149,7 +155,7 @@ export default function HomePage() {
                     )}
                 </div>
             </CSSTransition>
-            <p className="bottom-text mutedText">Created by <a href="https://ygoprodeck.com/">YGOPRODeck</a> ❤️</p>
+            <p className="bottom-text mutedText">Created by <a href="https://ygoprodeck.com/">YGOPRODeck</a> ❤️ <a href="https://github.com/AlanOC91/ygo-search">Github</a></p>
         </div>
     );
 }
