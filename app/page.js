@@ -4,6 +4,7 @@ import Image from 'next/image'
 import {FaSearch, FaExternalLinkAlt} from 'react-icons/fa';
 import {useState, useRef, useEffect} from 'react';
 import { CSSTransition } from 'react-transition-group';
+import SEO from './components/SEO';
 
 export default function HomePage() {
 
@@ -94,6 +95,7 @@ export default function HomePage() {
 
     return (
         <div className="container">
+            <SEO title="YGOSearch - Instant Yu-Gi-Oh! Card Search" description="An instant Yu-Gi-Oh! Card Search App from YGOPRODeck!" />
             <h1 className={`text-center`}>YGOSearch - Instant Yu-Gi-Oh! Card Fuzzy Searching</h1>
             <p className="low-margins"><a href="https://ygoprodeck.com/card-database/">Advanced Search</a></p>
             <form className="search-form" onSubmit={handleSearchFormSubmit}>
