@@ -10,7 +10,6 @@ export default function HomePage() {
     const [isLoading, setIsLoading] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [currentResultIndex, setCurrentResultIndex] = useState(0);
-    const [isLongDesc, setIsLongDesc] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchSubmitted, setSearchSubmitted] = useState(false);
     const [showSearchResult, setShowSearchResult] = useState(false);
@@ -46,11 +45,6 @@ export default function HomePage() {
             setSearchResults(data["cards"]); //Store search results in state
             setCurrentResultIndex(0); //Reset currentResultIndex to 0
             setCardInfo(data['cards'][0]);
-            if (data['cards'][0].desc.length > 550) {
-                setIsLongDesc(true); //used to adjust height of card description depending on length of description
-            }else{
-                setIsLongDesc(false);
-            }
         } else {
             setIsLoading(false);
             setSearchResults([]);
@@ -61,11 +55,6 @@ export default function HomePage() {
     function cardHit(result){
         if (result) {
             setCardInfo(result);
-            if (result.desc.length > 550) {
-                setIsLongDesc(true);
-            } else {
-                setIsLongDesc(false);
-            }
         }
     }
 
@@ -76,15 +65,6 @@ export default function HomePage() {
         const currentResult = searchResults[currentResultIndex];
         cardHit(currentResult);
     };
-
-    // Update the width of the cardResultsDescriptionRef when it has been set
-    useEffect(() => {
-        if (cardResultsDescriptionRef.current && isLongDesc) {
-            cardResultsDescriptionRef.current.style.height = "300px"; //So card text doesn't overflow
-        }else if (cardResultsDescriptionRef.current){
-            cardResultsDescriptionRef.current.style.height = "auto";
-        }
-    }, [isLongDesc]);
 
     // Left/Right arrow key navigation for search results
     useEffect(() => {
@@ -157,10 +137,12 @@ export default function HomePage() {
                                     {cardInfo.scale && <p>Scale: {cardInfo.scale}</p>}
                                 </div>
                                 <p className="card-description" ref={cardResultsDescriptionRef}>{cardInfo.desc}</p>
-                                <div className="card-links bottom-text">
+                                <div className="next-prev-links">
                                     {searchResults.length > 1 && (
                                         <button className="next-hit" onClick={handleNextHitButtonClick}>Next Hit (← / →)</button>
                                     )}
+                                </div>
+                                <div className="card-links bottom-text">
                                     {cardInfo.id && cardInfo.konami_id && (
                                         <>
                                             <a href={`https://ygoprodeck.com/card/${cardInfo.pretty_url}`} target="_blank" rel="noopener noreferrer">
@@ -187,7 +169,6 @@ export default function HomePage() {
                     )}
                 </div>
             </CSSTransition>
-            <p className="bottom-text mutedText">Created by <a href="https://ygoprodeck.com/">YGOPRODeck</a> ❤️ <a href="https://github.com/AlanOC91/ygo-search">Github</a></p>
         </div>
     );
 }
