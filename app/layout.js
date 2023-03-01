@@ -1,4 +1,5 @@
 import './globals.css'
+import { AnalyticsWrapper } from './components/analytics';
 
 function Footer() {
     return (
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
           {children}
           <Footer />
       </div>
+      <AnalyticsWrapper />
       </body>
     </html>
   )
